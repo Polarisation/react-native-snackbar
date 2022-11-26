@@ -65,7 +65,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 
 - (instancetype)init {
     self = [super initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 48,
-                                           [UIScreen mainScreen].bounds.size.width, 48)];
+                                              [UIScreen mainScreen].bounds.size.width, 48)];
     if (self) {
         [self buildView];
     }
@@ -202,7 +202,8 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
                                                                       metrics:nil
                                                                         views:@{@"self" : self}]];
 
-    // Snackbar will slide up from bottom, unless a bottom margin is set in which case we use a fade animation
+    // Snackbar will slide town from top, also use a fade animation
+    self.transform = CGAffineTransformMakeTranslation(0, -self.bounds.size.height);
     textLabel.alpha = 0;
     actionButton.alpha = 0;
     self.state = RNSnackBarViewStatePresenting;
@@ -236,7 +237,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     self.state = RNSnackBarViewStateDismissing;
     [UIView animateWithDuration:ANIMATION_DURATION
         animations:^{
-          self.transform = CGAffineTransformMakeTranslation(0, 0);
+          self.transform = CGAffineTransformMakeTranslation(0, -self.bounds.size.height);
           self.alpha = 0;
         }
         completion:^(BOOL finished) {
