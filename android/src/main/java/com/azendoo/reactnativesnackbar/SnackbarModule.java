@@ -10,8 +10,10 @@ import android.os.Build;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.facebook.react.bridge.Callback;
@@ -134,9 +136,9 @@ public class SnackbarModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        snackbar.setAnimationMode(marginBottom == 0
+        snackbar.setAnimationMode(/*marginBottom == 0
                 ? BaseTransientBottomBar.ANIMATION_MODE_SLIDE
-                : BaseTransientBottomBar.ANIMATION_MODE_FADE
+                :*/ BaseTransientBottomBar.ANIMATION_MODE_FADE
         );
 
         View snackbarView = snackbar.getView();
@@ -146,9 +148,12 @@ public class SnackbarModule extends ReactContextBaseJavaModule {
             snackbarView.setTextDirection(View.TEXT_DIRECTION_RTL);
         }
 
-        if (marginBottom != 0) {
-            snackbarView.setTranslationY(-(convertDpToPixel(marginBottom, snackbarView.getContext())));
-        }
+//        if (marginBottom != 0) {
+//            snackbarView.setTranslationY(convertDpToPixel(marginBottom, snackbarView.getContext()));
+//        }
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarView.getLayoutParams();
+        params.gravity = Gravity.TOP;
+        snackbarView.setLayoutParams(params);
 
         TextView snackbarText = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarText.setMaxLines(numberOfLines);
