@@ -65,7 +65,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
 
 - (instancetype)init {
     self = [super initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 48,
-                                           [UIScreen mainScreen].bounds.size.width, 48)];
+                                              [UIScreen mainScreen].bounds.size.width, 48)];
     if (self) {
         [self buildView];
     }
@@ -84,6 +84,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     textLabel.numberOfLines = 2;
     textLabel.textColor = _textColor;
     textLabel.font = [UIFont boldSystemFontOfSize:14];
+    textLabel.textAlignment = NSTextAlignmentCenter;
     [textLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addSubview:textLabel];
 
@@ -104,7 +105,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
                                                     multiplier:1
                                                       constant:0]];
     [textLabel setContentCompressionResistancePriority:250
-                                                forAxis:UILayoutConstraintAxisHorizontal];
+                                               forAxis:UILayoutConstraintAxisHorizontal];
     [textLabel setContentHuggingPriority:250 forAxis:UILayoutConstraintAxisHorizontal];
     [actionButton setContentCompressionResistancePriority:750
                                                   forAxis:UILayoutConstraintAxisHorizontal];
@@ -178,22 +179,21 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
         UIWindow *window = [[UIApplication sharedApplication] delegate].window;
 
         // If no bottom margin, increase bottom padding to size of safe area inset
-        if ([self.marginBottom integerValue] == 0 && window.safeAreaInsets.bottom > bottomPadding)
-            bottomPadding = window.safeAreaInsets.bottom;
+        if (window.safeAreaInsets.top > 0)
+            topPadding = window.safeAreaInsets.top + topPadding;
     }
-    NSLog([NSString stringWithFormat:@"V:|-%f-[textLabel]-%f-|", topPadding,
-           bottomPadding]);
+//    NSLog([NSString stringWithFormat:@"V:|-%f-[textLabel]-%f-|", topPadding,
+//           bottomPadding]);
     if (self.verticalPaddingConstraints) // Remove old constraints
         [self removeConstraints:self.verticalPaddingConstraints];
-    self.verticalPaddingConstraints = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[textLabel]-%f-|", topPadding,
-                                                                     bottomPadding]
+    self.verticalPaddingConstraints = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[textLabel]-%f-|", topPadding, bottomPadding]
                                                                             options:0
                                                                             metrics:nil
                                                                               views:@{@"textLabel" : textLabel}];
     [self addConstraints:self.verticalPaddingConstraints];
 
     // Set margins
-    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[self(>=48)]-%@-|", self.marginBottom]
+    [keyWindow addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[self(>=48)]"]
                                                                       options:0
                                                                       metrics:nil
                                                                         views:@{@"self" : self}]];
@@ -202,13 +202,10 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
                                                                       metrics:nil
                                                                         views:@{@"self" : self}]];
 
-    // Snackbar will slide up from bottom, unless a bottom margin is set in which case we use a fade animation
-    self.transform = CGAffineTransformMakeTranslation(0, [self.marginBottom integerValue] == 0 ? self.bounds.size.height : 0);
+    // Snackbar will slide town from top, also use a fade animation
+    self.transform = CGAffineTransformMakeTranslation(0, -self.bounds.size.height);
     textLabel.alpha = 0;
     actionButton.alpha = 0;
-    if ([self.marginBottom integerValue] == 0) {
-        self.alpha = 0;
-    }
     self.state = RNSnackBarViewStatePresenting;
     [UIView animateWithDuration:ANIMATION_DURATION
         animations:^{
@@ -240,7 +237,7 @@ static const NSTimeInterval ANIMATION_DURATION = 0.250;
     self.state = RNSnackBarViewStateDismissing;
     [UIView animateWithDuration:ANIMATION_DURATION
         animations:^{
-          self.transform = CGAffineTransformMakeTranslation(0, [self.marginBottom integerValue] == 0 ? self.bounds.size.height : 0);
+          self.transform = CGAffineTransformMakeTranslation(0, -self.bounds.size.height);
           self.alpha = 0;
         }
         completion:^(BOOL finished) {
